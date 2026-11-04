@@ -1,0 +1,18 @@
+# GPT-6.1 Terra API Cost Calculator
+
+> A free calculator and pricing reference for OpenAI's GPT-6.1 Terra API, released October 26, 2026. It prices input, cached input, cache writes, the >272K long-context surcharge and Batch/Flex/Fast modes, and compares Terra with GPT-5.6 Terra, GPT-6.1 Sol and GPT-6 Luna. Rates checked November 4, 2026.
+
+## Key facts
+- GPT-6.1 Terra standard API price: $1.00 per 1M input tokens, $0.05 per 1M cached input tokens, $5.00 per 1M output tokens.
+- Cache writes: $1.25 per 1M tokens (30-minute retention) or $2.50 per 1M tokens (12-hour retention).
+- Long-context surcharge: a request whose prompt exceeds 272,000 input tokens is billed at 2x input and cache rates and 1.5x output for the whole request.
+- Batch and Flex modes halve all rates; Fast mode doubles them.
+- GPT-5.6 Terra (predecessor) cost $2.00 input, $0.20 cached input, $12.00 output per 1M tokens.
+
+## Pages
+- [Cost calculator](https://binbin7418-dotcom.github.io/terra-cost-calculator/): interactive monthly cost calculator with model comparison and full pricing table.
+
+## Paid product
+- Terra Cost Planner Pack ($9.99, Gumroad): 25 pre-built workload scenarios with monthly Terra budgets calculated, a four-model monthly planner, and a usage-CSV estimator. https://binbinster.gumroad.com/l/terra-cost-planner
+
+Not affiliated with OpenAI.
