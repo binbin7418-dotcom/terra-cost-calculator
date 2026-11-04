@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT-6.1 Terra API Cost Calculator — Pricing, Cache & 272K Surcharge</title>
+<meta name="description" content="Free calculator for OpenAI GPT-6.1 Terra API costs: input, cached input, cache writes, the >272K long-context surcharge, Batch/Flex/Fast modes, and a side-by-side comparison with GPT-5.6 Terra, GPT-6.1 Sol and GPT-6 Luna. Rates checked Nov 4, 2026.">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;color:#1a1a1a;background:#fafafa;line-height:1.55}
+.wrap{max-width:880px;margin:0 auto;padding:24px 18px 64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0}
+h2{margin-top:36px;font-size:21px}
+.card{background:#fff;border:1px solid #e3e3e3;border-radius:12px;padding:20px;margin:18px 0}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;padding:9px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.big{font-size:32px;font-weight:800}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid #e7e7e7;padding:8px 6px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+.hl{background:#eef6ff}
+.btn{display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:9px;text-decoration:none;font-weight:700}
+.small{font-size:13px;color:#555}
+details{margin:10px 0}summary{font-weight:600;cursor:pointer}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"How much does GPT-6.1 Terra cost per million tokens?","acceptedAnswer":{"@type":"Answer","text":"Standard API rates are $1.00 per million input tokens, $0.05 per million cached input tokens and $5.00 per million output tokens. Cache writes cost $1.25 per million tokens for 30-minute retention or $2.50 for 12-hour retention."}},
+{"@type":"Question","name":"What is the GPT-6.1 Terra 272K long-context surcharge?","acceptedAnswer":{"@type":"Answer","text":"If a single request's prompt exceeds 272,000 input tokens, the entire request is billed at twice the input and cache rates and 1.5 times the output rate."}},
+{"@type":"Question","name":"How much cheaper is GPT-6.1 Terra than GPT-5.6 Terra?","acceptedAnswer":{"@type":"Answer","text":"Input dropped from $2 to $1, cached input from $0.20 to $0.05 and output from $12 to $5 per million tokens - roughly half on input and output, a quarter on cached reads."}},
+{"@type":"Question","name":"Do Batch and Flex modes change GPT-6.1 Terra pricing?","acceptedAnswer":{"@type":"Answer","text":"Yes. Batch and Flex bill at half the standard rates ($0.50 input, $2.50 output per million). Fast mode doubles them."}}]}
+</script>
+</head>
+<body>
+<div class="wrap">
+<h1>GPT-6.1 Terra API Cost Calculator</h1>
+<p>GPT-6.1 Terra (released October 26, 2026) looks simple at <b>$1 in / $5 out</b> per million tokens — until the cache-write tiers, the 272K long-context surcharge and the Batch/Flex/Fast modes get involved. This calculator prices all of it, and compares Terra against GPT-5.6 Terra, GPT-6.1 Sol and GPT-6 Luna on the same workload. Rates checked November 4, 2026.</p>
+
+<div class="card">
+<h2 style="margin-top:0">Calculate your monthly cost</h2>
+<div class="grid">
+<div><label>Fresh input tokens per month (millions)</label><input id="fresh" type="number" value="420" min="0" step="any"></div>
+<div><label>Cached input tokens per month (millions)</label><input id="cached" type="number" value="180" min="0" step="any"></div>
+<div><label>Cache-write tokens per month (millions)</label><input id="writes" type="number" value="60" min="0" step="any"></div>
+<div><label>Cache retention</label><select id="retention"><option value="1.25">30 minutes ($1.25 / 1M)</option><option value="2.50">12 hours ($2.50 / 1M)</option></select></div>
+<div><label>Output tokens per month (millions)</label><input id="out" type="number" value="90" min="0" step="any"></div>
+<div><label>Share of traffic over 272K prompt tokens (%)</label><input id="longshare" type="number" value="0" min="0" max="100" step="any"></div>
+<div><label>Mode</label><select id="mode"><option value="1">Standard</option><option value="0.5">Batch / Flex (half price)</option><option value="2">Fast (double)</option></select></div>
+</div>
+<p style="margin-top:18px">GPT-6.1 Terra monthly cost</p>
+<div class="big" id="total">$0</div>
+<p class="small" id="breakdown"></p>
+<h3>Same workload on other models (Standard rates)</h3>
+<table id="cmp"><thead><tr><th>Model</th><th>Input /1M</th><th>Cached /1M</th><th>Output /1M</th><th>Monthly cost</th></tr></thead><tbody></tbody></table>
+<p class="small">Sol and Luna publish no separate cached-input rate, so their cached tokens are billed at the full input rate in this comparison. Cache writes and the long-context surcharge are Terra-specific rows and are excluded from the comparison table.</p>
+</div>
+
+<h2>GPT-6.1 Terra pricing, in full</h2>
+<table>
+<tr><th>Item</th><th>Rate per 1M tokens</th></tr>
+<tr><td>Input</td><td>$1.00</td></tr>
+<tr><td>Cached input</td><td>$0.05</td></tr>
+<tr><td>Cache write, 30-minute retention</td><td>$1.25</td></tr>
+<tr><td>Cache write, 12-hour retention</td><td>$2.50</td></tr>
+<tr><td>Output</td><td>$5.00</td></tr>
+<tr><td>Prompts over 272K tokens</td><td>input &amp; cache ×2, output ×1.5 (whole request)</td></tr>
+<tr><td>Batch / Flex mode</td><td>all rates ×0.5</td></tr>
+<tr><td>Fast mode</td><td>all rates ×2</td></tr>
+</table>
+<p class="small">Context window 1.05M tokens, up to 128K output. The predecessor GPT-5.6 Terra cost $2 / $0.20 / $12 — Terra halves input and output and cuts cached reads by 75%.</p>
+
+<h2>Skip the spreadsheet work</h2>
+<div class="card">
+<p><b>Terra Cost Planner Pack — $9.99</b></p>
+<p>25 pre-built workload scenarios (support agents, invoice processing, RAG chatbots, computer-use RPA, batch pipelines…) with the monthly Terra budget already calculated, a four-model monthly planner, and a usage-CSV estimator with the formulas written out. Download, plug in your numbers, get a budget.</p>
+<p><a class="btn" href="https://binbinster.gumroad.com/l/terra-cost-planner">Get the Planner Pack</a></p>
+<p class="small">One-time payment. Not affiliated with OpenAI; rates verified November 4, 2026.</p>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>How much does GPT-6.1 Terra cost per million tokens?</summary><p>$1.00 input, $0.05 cached input, $5.00 output. Cache writes are $1.25 (30-minute retention) or $2.50 (12-hour) per million tokens.</p></details>
+<details><summary>What is the 272K surcharge?</summary><p>Any single request whose prompt exceeds 272,000 input tokens is billed at 2× input and cache rates and 1.5× output — for the entire request, not just the excess.</p></details>
+<details><summary>Is Terra cheaper than GPT-5.6 Terra for cache-heavy agents?</summary><p>Usually by a lot: cached reads fell from $0.20 to $0.05 per million. On a 10M-input session at 97% cache hit with 200K output, Terra costs about $1.79 versus $4.94 on GPT-5.6 Terra.</p></details>
+<details><summary>Do Batch and Flex really halve the bill?</summary><p>Yes — every rate halves ($0.50 input, $2.50 output). If your workload tolerates asynchronous processing, it is the single biggest saving available.</p></details>
+<p class="small" style="margin-top:40px">Independent tool, not affiliated with OpenAI. Prices as published by OpenAI and checked on November 4, 2026 — verify before committing a budget.</p>
+</div>
+<script>
+var MODELS=[
+ {name:"GPT-6.1 Terra",input:1.00,cached:0.05,output:5.00,terra:true},
+ {name:"GPT-5.6 Terra",input:2.00,cached:0.20,output:12.00},
+ {name:"GPT-6.1 Sol",input:2.00,cached:2.00,output:10.00},
+ {name:"GPT-6 Luna",input:0.10,cached:0.10,output:0.50}
+];
+function v(id){return parseFloat(document.getElementById(id).value)||0}
+function calc(){
+ var fresh=v('fresh'),cached=v('cached'),writes=v('writes'),out=v('out'),
+     ret=parseFloat(document.getElementById('retention').value),
+     ls=Math.min(v('longshare'),100)/100, mode=parseFloat(document.getElementById('mode').value);
+ var baseIn=fresh*1.00, baseCached=cached*0.05, baseWrite=writes*ret, baseOut=out*5.00;
+ var surcharge=ls*((fresh*1.00+cached*0.05)*1.0 + out*5.00*0.5);
+ var total=(baseIn+baseCached+baseWrite+baseOut+surcharge)*mode;
+ document.getElementById('total').textContent='$'+total.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+ document.getElementById('breakdown').textContent='Input $'+(baseIn*mode).toFixed(2)+' · Cached $'+(baseCached*mode).toFixed(2)+' · Cache writes $'+(baseWrite*mode).toFixed(2)+' · Output $'+(baseOut*mode).toFixed(2)+(surcharge>0?' · Long-context surcharge $'+(surcharge*mode).toFixed(2):'');
+ var tb=document.querySelector('#cmp tbody'); tb.innerHTML='';
+ MODELS.forEach(function(m){
+   var cost=fresh*m.input+cached*m.cached+out*m.output;
+   var tr=document.createElement('tr'); if(m.terra)tr.className='hl';
+   tr.innerHTML='<td>'+m.name+'</td><td>$'+m.input.toFixed(2)+'</td><td>$'+m.cached.toFixed(2)+'</td><td>$'+m.output.toFixed(2)+'</td><td>$'+cost.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>';
+   tb.appendChild(tr);
+ });
+}
+['fresh','cached','writes','out','longshare','retention','mode'].forEach(function(id){document.getElementById(id).addEventListener('input',calc)});
+calc();
+</script>
+</body>
+</html>
