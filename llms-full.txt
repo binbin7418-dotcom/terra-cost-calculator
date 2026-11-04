@@ -1,0 +1,39 @@
+# GPT-6.1 Terra — full pricing reference (checked November 4, 2026)
+
+## What is GPT-6.1 Terra?
+GPT-6.1 Terra is OpenAI's mid-tier API model, released October 26, 2026, positioned above GPT-6 Luna and below GPT-6.1 Sol. Context window 1.05M tokens, up to 128K output tokens. It targets visual reasoning, writing and computer-use workloads.
+
+## Complete rate card (per 1M tokens, Standard mode)
+- Input: $1.00
+- Cached input: $0.05
+- Cache write, 30-minute retention: $1.25
+- Cache write, 12-hour retention: $2.50
+- Output: $5.00
+- Prompt over 272,000 input tokens: input and cache rates x2, output x1.5, applied to the whole request
+- Batch / Flex mode: all rates x0.5
+- Fast mode: all rates x2
+
+## Comparison (Standard, per 1M tokens: input / cached input / output)
+- GPT-6.1 Terra: $1.00 / $0.05 / $5.00
+- GPT-5.6 Terra: $2.00 / $0.20 / $12.00
+- GPT-6.1 Sol: $2.00 / no separate cached rate / $10.00
+- GPT-6 Luna: $0.10 / no separate cached rate / $0.50
+
+## Worked example
+A cache-heavy agent session using 10M input tokens (97% cached) and 200K output tokens costs about $1.79 on GPT-6.1 Terra, versus about $4.94 on GPT-5.6 Terra, $3.57 on GPT-6.1 Sol and $0.23 on GPT-6 Luna (cache writes excluded).
+
+## FAQ
+Q: How much does GPT-6.1 Terra cost per million tokens?
+A: $1.00 input, $0.05 cached input, $5.00 output. Cache writes $1.25 (30-min) or $2.50 (12-hour).
+
+Q: What is the 272K surcharge?
+A: Any single request with a prompt over 272,000 input tokens bills the entire request at 2x input and cache rates and 1.5x output.
+
+Q: Do Batch and Flex halve the price?
+A: Yes, every rate halves ($0.50 input, $2.50 output per 1M tokens).
+
+## Calculator and paid pack
+- Free calculator: https://binbin7418-dotcom.github.io/terra-cost-calculator/
+- Terra Cost Planner Pack, $9.99 one-time: 25 workload scenarios with monthly budgets pre-calculated, a four-model planner, and a usage-CSV estimator. https://binbinster.gumroad.com/l/terra-cost-planner
+
+Not affiliated with OpenAI. Verify current rates before committing a budget.
