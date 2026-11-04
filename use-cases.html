@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GPT-6.1 Terra Use Cases — Real Workload Budgets Worked Out</title>
+<meta name="description" content="Five concrete GPT-6.1 Terra use cases with the monthly cost worked out for each: support chatbots, invoice processing, RAG assistants, session agents and batch pipelines — plus when Luna or Sol beats Terra.">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;color:#1a1a1a;background:#fafafa;line-height:1.55;font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0}
+h2{margin-top:36px;font-size:21px}
+.card{background:#fff;border:1px solid #e3e3e3;border-radius:12px;padding:20px;margin:16px 0}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.big{font-size:32px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid #e7e7e7;padding:8px 4px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+.hl{background:#eef6ff}
+.btn{display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600}
+.small{font-size:13px;color:#555}
+details{margin:12px 0}summary{font-weight:600;cursor:pointer}
+
+b,strong{font-weight:600}
+.band{background:#111;color:#f2f2f2;border-radius:12px;padding:20px;margin:16px 0}
+.band .small{color:#bbb}
+.chip{display:inline-block;border:1px solid #bbb;border-radius:999px;padding:4px 12px;margin:0 8px 8px 0;font-size:13px;font-weight:600}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a realistic monthly GPT-6.1 Terra budget for a small support chatbot?","acceptedAnswer":{"@type":"Answer","text":"Around $20-50 a month. A bot handling 200,000 conversations at roughly 3K input and 400 output tokens each lands near $22 on Terra when the system prompt is cached; the same bot cost roughly $65 on GPT-5.6 Terra."}},{"@type":"Question","name":"Which GPT-6.1 tier fits document processing like invoices?","acceptedAnswer":{"@type":"Answer","text":"Terra for extraction quality, run in Batch mode to halve the rates. Fields are short and structured, so most documents never touch the 272K surcharge. Luna can undercut Terra tenfold when the documents are simple forms."}},{"@type":"Question","name":"When is GPT-6 Luna a better choice than Terra?","acceptedAnswer":{"@type":"Answer","text":"When the task is high-volume and shallow: FAQ deflection, tagging, first-pass classification. Luna costs one tenth of Terra, so routing the easy 80% of traffic there and escalating the rest to Terra cuts most of the bill."}},{"@type":"Question","name":"When should I pay for GPT-6.1 Sol instead of Terra?","acceptedAnswer":{"@type":"Answer","text":"When a wrong answer is expensive: legal or financial reasoning, complex multi-step planning, code review of critical paths. Sol is exactly twice Terra's price, so most teams reserve it for the hardest slice of traffic rather than the whole workload."}}]}
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8G47H9DLC5"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-8G47H9DLC5');
+</script>
+</head>
+<body>
+<div class="wrap">
+<h1>GPT-6.1 Terra Use Cases: What Real Workloads Actually Cost</h1>
+<p>Terra's price list ($1 input / $0.05 cached / $5 output per million) only means something once it meets a real workload. Below are five concrete jobs teams run on Terra, each with the monthly arithmetic worked out. Run your own numbers in the <a href="index.html">free cost calculator</a>, or follow the <a href="how-to.html">step-by-step estimation guide</a>.</p>
+
+<h2>1. Customer support chatbot</h2>
+<div class="card">
+<p><b>The setup.</b> A SaaS helpdesk bot answers 200,000 conversations a month. Each conversation averages 3,000 input tokens (system prompt plus history) and 400 output tokens. The system prompt and help-center context repeat across nearly every session, so about 70% of input lands as cached reads.</p>
+<p><b>The math.</b> Fresh input 180M × $1.00 = $180; cached input 420M × $0.05 = $21; output 80M × $5.00 = $400 — roughly <b>$600/month</b> at full volume, or about <b>$22/month</b> for a smaller bot doing 7,500 conversations. The same workload on GPT-5.6 Terra ran about 2.7× more, because cached reads were $0.20 instead of $0.05.</p>
+<p><b>The lever.</b> Cache hit rate. Moving from 50% to 90% cached input is worth more than any other optimization on this workload.</p>
+</div>
+
+<h2>2. Invoice and document processing</h2>
+<div class="card">
+<p><b>The setup.</b> An accounting tool extracts vendor, amounts, tax IDs and line items from 50,000 invoices a month. Each document is about 2,000 input tokens; the extraction schema returns roughly 300 output tokens. Nothing is latency-sensitive, so everything runs in Batch mode.</p>
+<p><b>The math.</b> Input 100M × $0.50 (Batch) = $50; output 15M × $2.50 (Batch) = $37.50 — about <b>$88/month</b>. Short documents never approach the 272K threshold, so the surcharge never applies.</p>
+<p><b>The lever.</b> Batch mode halves every rate. If your pipeline can wait minutes instead of seconds, this is the cheapest serious document extraction available in the GPT-6 family.</p>
+</div>
+
+<h2>3. RAG assistant over a company knowledge base</h2>
+<div class="card">
+<p><b>The setup.</b> An internal assistant answers employee questions over retrieved documents: 30,000 questions a month, each carrying about 8,000 tokens of retrieved context and producing a 600-token answer.</p>
+<p><b>The math.</b> Input 240M × $1.00 = $240; output 18M × $5.00 = $90 — about <b>$330/month</b>. Retrieved chunks repeat across similar questions, so a healthy cache trims the input line further.</p>
+<p><b>The lever.</b> Watch prompt size. If retrieval starts stuffing whole manuals into single requests past 272K tokens, the entire request bills at double input — chunk discipline is a billing feature, not just a quality one.</p>
+</div>
+
+<h2>4. Long-session agent (computer use / RPA)</h2>
+<div class="card">
+<p><b>The setup.</b> A browser agent works through multi-step tasks — checking dashboards, reconciling records — in sessions of around 10M input tokens at a 97% cache hit rate, with 200K output tokens per session.</p>
+<p><b>The math.</b> Per session: fresh input 0.3M × $1.00 = $0.30; cached 9.7M × $0.05 = $0.49; output 0.2M × $5.00 = $1.00 — about <b>$1.79 per session</b>, versus $4.94 for the identical session on GPT-5.6 Terra.</p>
+<p><b>The lever.</b> Session length works for you here, not against you: the longer the session, the higher the cached share — as long as no single request crosses 272K fresh tokens.</p>
+</div>
+
+<h2>5. Overnight batch pipeline (classification and enrichment)</h2>
+<div class="card">
+<p><b>The setup.</b> A data team classifies and enriches 2 million short records nightly — tickets, listings, leads. Each record is about 500 input tokens and 100 output tokens, all processed in Batch/Flex mode.</p>
+<p><b>The math.</b> Per night: input 1,000M × $0.50 = $500; output 200M × $2.50 = $500 — about <b>$1,000/night</b> at that scale, scaling linearly down: a tenth of the volume is a tenth of the price.</p>
+<p><b>The lever.</b> Model routing. Shallow records (tagging, sentiment, dedup keys) belong on GPT-6 Luna at one tenth of Terra's price; send only ambiguous records up to Terra and the nightly bill drops by most of its size.</p>
+</div>
+
+<h2>Which tier for which job?</h2>
+<table>
+<tr><th>Workload</th><th>Best fit</th><th>Why</th></tr>
+<tr><td>Support chatbot</td><td>Terra</td><td>Strong answers, cheap cached reads for repeated prompts</td></tr>
+<tr><td>Invoice extraction</td><td>Terra (Batch)</td><td>Extraction quality at half rates, no surcharge risk</td></tr>
+<tr><td>RAG assistant</td><td>Terra</td><td>Mid-size contexts, cache-friendly, good reasoning</td></tr>
+<tr><td>FAQ deflection, tagging</td><td>Luna</td><td>One tenth of Terra's price, plenty for shallow tasks</td></tr>
+<tr><td>Hard reasoning steps</td><td>Sol</td><td>Twice Terra's price, reserved for where errors are costly</td></tr>
+</table>
+
+<div class="band"><div class="big" style="font-size:28px">$1.79 vs $4.94</div><p style="margin:8px 0 0">The same 10M-token agent session, priced on GPT-6.1 Terra vs GPT-5.6 Terra. Most of the gap is one line: cached reads at $0.05 instead of $0.20 per million.</p></div>
+<h2>All 25 scenarios, pre-calculated</h2>
+<div class="card">
+<p><b>Terra Cost Planner Pack — $9.99</b></p>
+<p>The five scenarios above plus twenty more (code review assistants, meeting summarizers, translation pipelines, moderation queues…) with the monthly Terra budget already calculated, a four-model monthly planner, and a usage-CSV estimator with the formulas written out.</p>
+<p><a class="btn" href="https://binbinster.gumroad.com/l/terra-cost-planner">Get the Planner Pack</a></p>
+<p class="small">One-time payment. Not affiliated with OpenAI; rates verified November 4, 2026. Or run your own numbers first in the <a href="index.html">free calculator</a>.</p>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>What is a realistic monthly GPT-6.1 Terra budget for a small support chatbot?</summary><p>Around $20-50 a month. A bot handling 200,000 conversations at roughly 3K input and 400 output tokens each lands near $22 on Terra when the system prompt is cached; the same bot cost roughly $65 on GPT-5.6 Terra.</p></details>
+<details><summary>Which GPT-6.1 tier fits document processing like invoices?</summary><p>Terra for extraction quality, run in Batch mode to halve the rates. Fields are short and structured, so most documents never touch the 272K surcharge. Luna can undercut Terra tenfold when the documents are simple forms.</p></details>
+<details><summary>When is GPT-6 Luna a better choice than Terra?</summary><p>When the task is high-volume and shallow: FAQ deflection, tagging, first-pass classification. Luna costs one tenth of Terra, so routing the easy 80% of traffic there and escalating the rest to Terra cuts most of the bill.</p></details>
+<details><summary>When should I pay for GPT-6.1 Sol instead of Terra?</summary><p>When a wrong answer is expensive: legal or financial reasoning, complex multi-step planning, code review of critical paths. Sol is exactly twice Terra's price, so most teams reserve it for the hardest slice of traffic rather than the whole workload.</p></details>
+
+<p class="small" style="margin-top:40px">Independent tool, not affiliated with OpenAI. Prices as published by OpenAI and checked on November 4, 2026 — verify before committing a budget.</p>
+<nav style="margin-top:32px;text-align:center"><a class="btn" href="index.html">Cost Calculator</a> <a class="btn" href="use-cases.html">Use Cases</a> <a class="btn" href="how-to.html">How To</a></nav>
+</div>
+</body>
+</html>
