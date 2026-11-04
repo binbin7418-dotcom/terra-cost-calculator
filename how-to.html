@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Estimate Your GPT-6.1 Terra API Bill — Step by Step</title>
+<meta name="description" content="A five-step guide to estimating a GPT-6.1 Terra monthly bill: measure tokens from your usage report, split fresh vs cached input, add cache writes, apply the mode multiplier and check the 272K surcharge.">
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;color:#1a1a1a;background:#fafafa;line-height:1.55;font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0}
+h2{margin-top:36px;font-size:21px}
+.card{background:#fff;border:1px solid #e3e3e3;border-radius:12px;padding:20px;margin:16px 0}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.big{font-size:32px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid #e7e7e7;padding:8px 4px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+.hl{background:#eef6ff}
+.btn{display:inline-block;background:#111;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600}
+.small{font-size:13px;color:#555}
+details{margin:12px 0}summary{font-weight:600;cursor:pointer}
+
+b,strong{font-weight:600}
+.band{background:#111;color:#f2f2f2;border-radius:12px;padding:20px;margin:16px 0}
+.band .small{color:#bbb}
+.chip{display:inline-block;border:1px solid #bbb;border-radius:999px;padding:4px 12px;margin:0 8px 8px 0;font-size:13px;font-weight:600}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Where do I find my actual token usage to estimate a Terra bill?","acceptedAnswer":{"@type":"Answer","text":"In the OpenAI usage dashboard or your API response logs: total input tokens, cached input tokens and output tokens per period. Those three numbers are everything the estimate needs; multiply by the Terra rates and apply your mode multiplier."}},{"@type":"Question","name":"How do I know what share of my input is cached?","acceptedAnswer":{"@type":"Answer","text":"Your usage report lists cached input tokens separately from total input. Divide cached by total input to get the hit rate. If you are pre-launch, assume 0% for a safe upper bound, then re-estimate once real traffic shows the true rate."}},{"@type":"Question","name":"What is the most common GPT-6.1 Terra budgeting mistake?","acceptedAnswer":{"@type":"Answer","text":"Forgetting the 272K surcharge and cache writes. A workload that looks cheap at $1/$5 can double on the requests whose prompts cross 272K tokens, and cache writes at $1.25-$2.50 per million add up on systems that rewrite their context every session."}}]}
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8G47H9DLC5"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-8G47H9DLC5');
+</script>
+</head>
+<body>
+<div class="wrap">
+<h1>How to Estimate Your GPT-6.1 Terra Bill in Five Steps</h1>
+<p>Terra pricing has five moving parts: fresh input, cached input, cache writes, output, and the mode multiplier — plus one trap, the 272K surcharge. This guide walks the estimate in order. Prefer clicking to arithmetic? The <a href="index.html">free calculator</a> does all five steps at once; worked examples for common jobs are on the <a href="use-cases.html">use cases page</a>.</p>
+
+<div class="band"><p style="margin:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px">monthly ≈ (fresh × $1.00 + cached × $0.05 + writes × $1.25–2.50 + output × $5.00) × mode — then check the 272K share</p></div>
+<h2>Step 1 — Measure your monthly tokens</h2>
+<div class="card">
+<p>Open your OpenAI usage report (or last month's logs from your current provider) and pull three numbers for the period: <b>total input tokens</b>, <b>cached input tokens</b> and <b>output tokens</b>. No report yet? Estimate from a sample: run 100 representative requests, average their token counts, and multiply by your expected monthly request volume.</p>
+<p class="small">Example: a support bot at 200,000 conversations × (3,000 in / 400 out) = 600M input and 80M output tokens per month.</p>
+</div>
+
+<h2>Step 2 — Split input into fresh vs cached</h2>
+<div class="card">
+<p>Terra bills these twenty-fold apart ($1.00 vs $0.05 per million), so the split matters more than the total. Subtract cached input from total input to get fresh input. If your workload repeats a system prompt, a document set or a conversation prefix, most of your input should land in the cached bucket — check the hit rate in your usage report rather than guessing.</p>
+<p class="small">Example: 600M total input at a 70% cache hit rate = 180M fresh + 420M cached.</p>
+</div>
+
+<h2>Step 3 — Add cache writes</h2>
+<div class="card">
+<p>Writing the cache is not free: $1.25 per million tokens at 30-minute retention, $2.50 at 12-hour retention. Estimate how many tokens your system writes per month — roughly, the size of your cached context × how often it is refreshed. Long-lived contexts written once are nearly free; contexts rebuilt every session are a real line item.</p>
+<p class="small">Example: 60M write tokens a month at 30-minute retention = $75.</p>
+</div>
+
+<h2>Step 4 — Apply the mode multiplier</h2>
+<div class="card">
+<p>Multiply the running total by your mode: <b>Standard ×1</b>, <b>Batch/Flex ×0.5</b>, <b>Fast ×2</b>. Mixed workloads split here too — price the interactive share at Standard and the asynchronous share at Batch separately, then add.</p>
+<p class="small">Example: the support bot is fully interactive, so its $676 subtotal stays ×1. The invoice pipeline from the use cases page runs entirely in Batch and halves.</p>
+</div>
+
+<h2>Step 5 — Check the 272K surcharge</h2>
+<div class="card">
+<p>Finally, ask what share of your requests carry a prompt over 272,000 input tokens. Those requests bill at 2× input and cache rates and 1.5× output — for the whole request, not just the excess. Enter that share in the calculator's surcharge field, or add the uplift by hand: surcharge ≈ (share) × (that traffic's input + cache cost) + 0.5 × (share) × (its output cost). If the share is large, the real fix is architectural — split or trim the mega-prompts.</p>
+<p class="small">Example: 5% of RAG traffic crossing 272K adds roughly 5% to that workload's input line — small here, decisive for document-stuffing pipelines.</p>
+</div>
+
+<h2>Sanity-check against a known scenario</h2>
+<p>Compare your result with the five worked budgets on the <a href="use-cases.html">use cases page</a>. If your per-request cost lands far from the scenario closest to your workload, a split or a multiplier above is probably off — most often the cache hit rate.</p>
+
+<h2>Skip the spreadsheet work</h2>
+<div class="card">
+<p><b>Terra Cost Planner Pack — $9.99</b></p>
+<p>25 pre-built workload scenarios with the monthly Terra budget already calculated, a four-model monthly planner, and a usage-CSV estimator with the formulas written out. Download, plug in your numbers, get a budget.</p>
+<p><a class="btn" href="https://binbinster.gumroad.com/l/terra-cost-planner">Get the Planner Pack</a></p>
+<p class="small">One-time payment. Not affiliated with OpenAI; rates verified November 4, 2026.</p>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>Where do I find my actual token usage to estimate a Terra bill?</summary><p>In the OpenAI usage dashboard or your API response logs: total input tokens, cached input tokens and output tokens per period. Those three numbers are everything the estimate needs; multiply by the Terra rates and apply your mode multiplier.</p></details>
+<details><summary>How do I know what share of my input is cached?</summary><p>Your usage report lists cached input tokens separately from total input. Divide cached by total input to get the hit rate. If you are pre-launch, assume 0% for a safe upper bound, then re-estimate once real traffic shows the true rate.</p></details>
+<details><summary>What is the most common GPT-6.1 Terra budgeting mistake?</summary><p>Forgetting the 272K surcharge and cache writes. A workload that looks cheap at $1/$5 can double on the requests whose prompts cross 272K tokens, and cache writes at $1.25-$2.50 per million add up on systems that rewrite their context every session.</p></details>
+
+<p class="small" style="margin-top:40px">Independent tool, not affiliated with OpenAI. Prices as published by OpenAI and checked on November 4, 2026 — verify before committing a budget.</p>
+<nav style="margin-top:32px;text-align:center"><a class="btn" href="index.html">Cost Calculator</a> <a class="btn" href="use-cases.html">Use Cases</a> <a class="btn" href="how-to.html">How To</a></nav>
+</div>
+</body>
+</html>
