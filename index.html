@@ -44,6 +44,10 @@ gtag('config', 'G-8G47H9DLC5');
 
 <div class="card">
 <h2 style="margin-top:0">Calculate your monthly cost</h2>
+<p style="margin:14px 0 2px"><b>Start from an example workload:</b><br>
+<button type="button" onclick="preset(120,380,40,60,1)">Support chatbot</button>
+<button type="button" onclick="preset(300,150,80,45,1)">RAG assistant</button>
+<button type="button" onclick="preset(900,0,0,300,0.5)">Batch pipeline (Batch mode)</button></p>
 <div class="grid">
 <div><label>Fresh input tokens per month (millions)</label><input id="fresh" type="number" value="420" min="0" step="any"></div>
 <div><label>Cached input tokens per month (millions)</label><input id="cached" type="number" value="180" min="0" step="any"></div>
@@ -54,10 +58,10 @@ gtag('config', 'G-8G47H9DLC5');
 <div><label>Mode</label><select id="mode"><option value="1">Standard</option><option value="0.5">Batch / Flex (half price)</option><option value="2">Fast (double)</option></select></div>
 </div>
 <p style="margin-top:18px">GPT-6.1 Terra monthly cost</p>
-<div class="big" id="total">$0</div>
-<p class="small" id="breakdown"></p>
+<div class="big" id="total">$954.00</div>
+<p class="small" id="breakdown">Input $420.00 · Cached $9.00 · Cache writes $75.00 · Output $450.00</p>
 <h3>Same workload on other models (Standard rates)</h3>
-<table id="cmp"><thead><tr><th>Model</th><th>Input /1M</th><th>Cached /1M</th><th>Output /1M</th><th>Monthly cost</th></tr></thead><tbody></tbody></table>
+<table id="cmp"><thead><tr><th>Model</th><th>Input /1M</th><th>Cached /1M</th><th>Output /1M</th><th>Monthly cost</th></tr></thead><tbody><tr class="hl"><td>GPT-6.1 Terra</td><td>$1.00</td><td>$0.05</td><td>$5.00</td><td>$879.00</td></tr><tr><td>GPT-5.6 Terra</td><td>$2.00</td><td>$0.20</td><td>$12.00</td><td>$1,956.00</td></tr><tr><td>GPT-6.1 Sol</td><td>$2.00</td><td>$2.00</td><td>$10.00</td><td>$2,100.00</td></tr><tr><td>GPT-6 Luna</td><td>$0.10</td><td>$0.10</td><td>$0.50</td><td>$105.00</td></tr></tbody></table>
 <p class="small">Sol and Luna publish no separate cached-input rate, so their cached tokens are billed at the full input rate in this comparison. Cache writes and the long-context surcharge are Terra-specific rows and are excluded from the comparison table.</p>
 </div>
 
@@ -82,6 +86,12 @@ gtag('config', 'G-8G47H9DLC5');
 <p><a class="btn" href="https://binbinster.gumroad.com/l/terra-cost-planner">Get the Planner Pack</a></p>
 <p class="small">One-time payment. Not affiliated with OpenAI; rates verified November 4, 2026.</p>
 </div>
+
+<h2>About GPT-6.1 Terra — and how this calculator works</h2>
+<p>GPT-6.1 Terra is OpenAI's mid-tier GPT-6.1 model, released October 26, 2026: $1.00 input / $5.00 output per million tokens, a 1.05M-token context window and up to 128K output. It sits between GPT-6.1 Sol (flagship reasoning, exactly double the price) and GPT-6 Luna (budget tier, one tenth of the price); its predecessor GPT-5.6 Terra cost $2 / $12.</p>
+<p><b>Sources &amp; freshness.</b> All rates on this page are OpenAI's published API rates, checked on November 4, 2026. We re-check this page whenever OpenAI changes its pricing pages, and the check date above changes with every revision. This is an independent tool, not affiliated with OpenAI — verify rates before committing a budget.</p>
+<p><b>Method.</b> The comparison table runs the <i>same</i> workload (your inputs above) through every model at Standard rates. Sol and Luna publish no separate cached-input rate, so their cached tokens are billed at the full input rate here. Cache writes and the 272K long-context surcharge are Terra-specific and are counted in Terra's own total above, but excluded from the comparison table so the four models stay on equal footing.</p>
+<p><b>Who Terra fits.</b> If your project is a support agent, RAG chatbot or document pipeline with a repeated system prompt, Terra's $0.05 cached reads usually make it the cheapest capable tier. If your project is mostly simple classification or FAQ replies, Luna does it at a tenth of the price. If your project lives or dies on the hardest reasoning steps, price Sol for those steps and Terra for everything else.</p>
 
 <h2>FAQ</h2>
 <details><summary>How much does GPT-6.1 Terra cost per million tokens?</summary><p>$1.00 input, $0.05 cached input, $5.00 output. Cache writes are $1.25 (30-minute retention) or $2.50 (12-hour) per million tokens.</p></details>
@@ -124,6 +134,7 @@ function calc(){
    tb.appendChild(tr);
  });
 }
+function preset(f,c,w,o,m){document.getElementById('fresh').value=f;document.getElementById('cached').value=c;document.getElementById('writes').value=w;document.getElementById('out').value=o;document.getElementById('mode').value=String(m);calc();}
 ['fresh','cached','writes','out','longshare','retention','mode'].forEach(function(id){document.getElementById(id).addEventListener('input',calc)});
 calc();
 </script>
